@@ -42,14 +42,8 @@ export function handler({
     },
   );
 
-  var builder = require('junit-report-builder');
-  var suite = builder.testSuite().name('GraphQL validation suite');
-
   if (!invalidDocuments.length) {
     Logger.success('All documents are valid');
-
-    suite.testCase()
-      .name('All documents are valid');
   } else {
     const errorsCount = countErrors(invalidDocuments);
     const deprecated = countDeprecated(invalidDocuments);
@@ -65,18 +59,11 @@ export function handler({
         if (doc.errors.length) {
           renderInvalidDocument(doc).forEach((line) => {
             Logger.log(line);
-
-            suite.testCase()
-              .name(line)
-              .error()
           });
         }
       });
     } else if (!failOnDeprecated) {
       Logger.success('All documents are valid');
-
-      suite.testCase()
-        .name('All documents are valid');
     }
 
     if (deprecated) {
@@ -91,10 +78,6 @@ export function handler({
           renderDeprecatedUsageInDocument(doc, failOnDeprecated).forEach(
             (line) => {
               Logger.log(line);
-
-              suite.testCase()
-                .name(line)
-                .failure();
             },
           );
         }
@@ -102,7 +85,6 @@ export function handler({
     }
 
     if (errorsCount || (deprecated && failOnDeprecated)) {
-      builder.writeTo('graphql-validate-test-report.xml');
       process.exit(1);
     }
   }
